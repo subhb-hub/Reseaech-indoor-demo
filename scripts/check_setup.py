@@ -13,6 +13,7 @@ def main() -> None:
     try:
         import torch
         import torchvision
+        import sklearn
     except ImportError as exc:
         print(f"Missing dependency: {exc.name}")
         print("Run: pip install -r requirements.txt")
@@ -20,9 +21,8 @@ def main() -> None:
 
     print(f"PyTorch: {torch.__version__}")
     print(f"Torchvision: {torchvision.__version__}")
-    print(f"CUDA available: {torch.cuda.is_available()}")
-    if hasattr(torch.backends, "mps"):
-        print(f"MPS available: {torch.backends.mps.is_available()}")
+    print(f"Scikit-learn: {sklearn.__version__}")
+    print("Device policy: CPU only")
 
     from train_fashion import SimpleCNN, count_parameters
 

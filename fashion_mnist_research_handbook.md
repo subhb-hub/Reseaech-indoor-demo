@@ -1,7 +1,7 @@
 # Fashion-MNIST 新生科研入门实操手册
 
 > 主题论文：**Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms**  
-> 教学目标：让新生在一次课内完成“读论文 → 找代码/数据 → 跑 baseline → 做一个 toy 创新 → 写 demo LaTeX paper”的完整科研闭环。  
+> 教学目标：让新生在一次课内完成“找论文 → 找官方代码仓库 → clone 官方仓库 → 复现 baseline → 自己实现 toy 创新 → 写 demo LaTeX paper”的完整科研闭环。  
 > 本手册中的“创新点”是**教学型创新**，不保证真的有效，也不能直接当作正式论文贡献。它的价值在于训练科研流程、实验意识和论文表达。
 
 ---
@@ -49,6 +49,116 @@ Fashion-MNIST 是一个类似 MNIST 的图像分类数据集。每张图像是 `
 
 这意味着：新生不需要先学完所有深度学习理论，也能先完成一个最小可行科研项目。
 
+### 1.3 如何从零找到论文？
+
+课堂上不要一开始就打开代码。先让学生体验一次真实的科研搜索流程。
+
+可以从这些关键词开始搜：
+
+```text
+Fashion-MNIST paper
+Fashion-MNIST arXiv
+Fashion-MNIST a Novel Image Dataset for Benchmarking Machine Learning Algorithms
+```
+
+找到论文页面后，先检查 4 件事：
+
+| 要检查什么 | 在哪里看 | 为什么重要 |
+|---|---|---|
+| 标题 | arXiv / PDF 首页 | 确认不是找错论文 |
+| 作者 | PDF 首页 | 知道谁提出了数据集 |
+| 摘要 | Abstract | 快速判断任务和贡献 |
+| 代码或数据链接 | PDF、arXiv 页面、README | 后续复现需要入口 |
+
+目标论文是：
+
+```text
+Fashion-MNIST: a Novel Image Dataset for Benchmarking Machine Learning Algorithms
+https://arxiv.org/abs/1708.07747
+```
+
+### 1.4 如何找到官方代码仓库？
+
+找到论文之后，继续找官方仓库。常见路径有三种：
+
+1. 在论文 PDF 里搜索 `github`；
+2. 在 arXiv 页面或搜索结果里找 `Code` / `GitHub`；
+3. 直接搜索 `Fashion-MNIST GitHub official`。
+
+本项目对应的官方仓库是：
+
+```text
+https://github.com/zalandoresearch/fashion-mnist
+```
+
+判断它是不是可信仓库时，不要只看名字，要看证据：
+
+| 证据 | 说明 |
+|---|---|
+| owner 是 `zalandoresearch` | 和 Fashion-MNIST 原始发布方一致 |
+| README 说明数据集规模 | 60,000 train + 10,000 test |
+| 仓库包含 `data/`、`utils/`、`benchmark/` | 有数据、读取工具和 benchmark 入口 |
+| README 给出引用信息 | 能对应到论文 |
+
+这一步的教学重点是：科研复现不是“随便找一个 GitHub 仓库”，而是先判断来源是否可靠。
+
+### 1.5 Clone 官方仓库并做最小复现检查
+
+本课程仓库提供了一个小脚本，帮助学生把官方仓库 clone 到 `external/` 目录：
+
+```bash
+bash scripts/clone_official_repo.sh
+```
+
+运行后会得到：
+
+```text
+external/fashion-mnist/
+├── data/
+├── utils/
+├── benchmark/
+└── README.md
+```
+
+然后脚本会自动执行：
+
+```bash
+python scripts/check_official_clone.py
+```
+
+它会使用官方仓库里的 `utils/mnist_reader.py` 读取官方数据，并打印类似信息：
+
+```text
+Official Fashion-MNIST clone looks good.
+Train images: (60000, 784), train labels: (60000,)
+Test images: (10000, 784), test labels: (10000,)
+```
+
+这一步不是训练模型，而是科研复现里的第一道门槛：确认论文数据和官方代码能在自己机器上被正确读取。
+
+### 1.6 用官方数据链路做一次轻量复现
+
+官方 README 提到可以运行 `benchmark/runner.py` 复现 benchmark。这个完整 benchmark 覆盖很多 scikit-learn 分类器，课堂上可能比较慢，所以我们先做一个适合笔记本的 smoke reproduction：
+
+```bash
+python scripts/reproduce_official_smoke.py
+```
+
+这个脚本会做 4 件事：
+
+1. 调用官方仓库的 `utils/mnist_reader.py`；
+2. 读取 `external/fashion-mnist/data/fashion` 中的官方数据；
+3. 抽取一个小训练子集和测试子集；
+4. 训练一个轻量 scikit-learn baseline 并输出 accuracy。
+
+做到这里，学生已经完成了真实复现流程的前半段：
+
+```text
+找到论文 -> 找到官方仓库 -> clone -> 读懂 README -> 用官方数据链路跑通最小实验
+```
+
+然后我们再进入课程自己的 PyTorch CNN baseline，因为它更适合 CPU 笔记本上的课堂演示和后续方法修改。
+
 ---
 
 ## 2. 项目结构
@@ -58,11 +168,15 @@ Fashion-MNIST 是一个类似 MNIST 的图像分类数据集。每张图像是 `
 ```bash
 .
 ├── data/                              # 自动下载数据集
+├── external/                          # clone 官方 Fashion-MNIST 仓库，不提交
 ├── outputs/                           # 保存模型和实验结果
 ├── scripts/
 │   ├── check_setup.py                 # 课前环境检查
-│   └── run_all_experiments.sh          # 一键跑三个实验
-├── train_fashion.py                   # 主训练脚本
+│   ├── check_official_clone.py         # 检查官方仓库和数据读取
+│   ├── clone_official_repo.sh          # clone 官方仓库
+│   ├── reproduce_official_smoke.py     # 用官方数据链路做轻量复现
+│   └── run_all_experiments.sh          # 先跑 baseline，再提示创新实验
+├── train_fashion.py                   # 主训练脚本，创新部分保留 TODO
 ├── results_summary.csv                # 自动生成的实验记录
 └── demo_paper/                        # 后续写 LaTeX 小论文
     ├── main.tex
@@ -130,7 +244,7 @@ baseline 是你要比较的基础方法。它不一定很强，但必须：
 - noise control；
 - 训练、测试和结果记录。
 
-如果你想让学生练习“从空文件复制代码”的流程，也可以把下面完整代码作为讲义材料使用。
+注意：本仓库不是直接给出“改好后的创新版本”。下面代码中的 `sobel_edge` 和 `noise` 分支是课堂 TODO，学生需要在老师带领下补完。
 
 ```python
 import argparse
@@ -158,53 +272,35 @@ def set_seed(seed: int = 42):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
 
 
 def get_device(name: str):
-    if name != "auto":
-        return torch.device(name)
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        return torch.device("mps")
+    if name != "cpu":
+        raise ValueError("This classroom repo is configured to run on CPU only. Use --device cpu.")
     return torch.device("cpu")
 
 
 def sobel_edge(x: torch.Tensor) -> torch.Tensor:
     """
-    x: [1, H, W], value range usually [0, 1]
-    return: [1, H, W], normalized Sobel edge magnitude
+    TODO for class:
+    Implement Sobel edge extraction for a tensor with shape [1, H, W].
+
+    Hints:
+    1. Define horizontal and vertical Sobel kernels.
+    2. Use F.conv2d with padding=1.
+    3. Combine the two responses with sqrt(gx ** 2 + gy ** 2).
+    4. Normalize the edge map before returning it.
     """
-    kx = torch.tensor(
-        [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]],
-        dtype=x.dtype,
-        device=x.device,
-    ).view(1, 1, 3, 3)
-
-    ky = torch.tensor(
-        [[-1, -2, -1], [0, 0, 0], [1, 2, 1]],
-        dtype=x.dtype,
-        device=x.device,
-    ).view(1, 1, 3, 3)
-
-    x4d = x.unsqueeze(0)  # [1, 1, H, W]
-    gx = F.conv2d(x4d, kx, padding=1)
-    gy = F.conv2d(x4d, ky, padding=1)
-    edge = torch.sqrt(gx ** 2 + gy ** 2).squeeze(0)  # [1, H, W]
-    edge = edge / (edge.max() + 1e-6)
-    return edge
+    raise NotImplementedError("课堂练习：请在这里实现 Sobel edge map。")
 
 
 class ExtraChannelDataset(Dataset):
     """
+    TODO for class:
     Wrap a FashionMNIST dataset and add an extra channel.
 
     mode='edge': concatenate original image and Sobel edge map.
     mode='noise': concatenate original image and random noise map.
-
-    The noise mode is a negative control. If edge and random noise perform similarly,
-    then our edge story is probably weak.
     """
     def __init__(self, base_dataset, mode: str):
         assert mode in ["edge", "noise"]
@@ -219,7 +315,7 @@ class ExtraChannelDataset(Dataset):
         if self.mode == "edge":
             extra = sobel_edge(x)
         else:
-            extra = torch.rand_like(x)
+            raise NotImplementedError("课堂练习：请在这里实现 random-noise control。")
         x = torch.cat([x, extra], dim=0)  # [2, 28, 28]
         return x, y
 
@@ -315,7 +411,7 @@ def main():
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument("--device", type=str, default="cpu", choices=["cpu"])
     parser.add_argument("--data-dir", type=str, default="./data")
     parser.add_argument("--output-dir", type=str, default="./outputs")
     args = parser.parse_args()

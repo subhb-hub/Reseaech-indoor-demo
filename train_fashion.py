@@ -31,47 +31,30 @@ def set_seed(seed: int = 42) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
 
 
 def get_device(name: str) -> torch.device:
-    if name != "auto":
-        return torch.device(name)
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        return torch.device("mps")
+    if name != "cpu":
+        raise ValueError("This classroom repo is configured to run on CPU only. Use --device cpu.")
     return torch.device("cpu")
 
 
 def sobel_edge(x: torch.Tensor) -> torch.Tensor:
     """
-    Args:
-        x: Tensor with shape [1, H, W], usually in range [0, 1].
+    TODO for class:
+    Implement Sobel edge extraction for a tensor with shape [1, H, W].
 
-    Returns:
-        Tensor with shape [1, H, W], normalized Sobel edge magnitude.
+    Hints:
+    1. Define horizontal and vertical Sobel kernels.
+    2. Use F.conv2d with padding=1.
+    3. Combine the two responses with sqrt(gx ** 2 + gy ** 2).
+    4. Normalize the edge map before returning it.
     """
-    kx = torch.tensor(
-        [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]],
-        dtype=x.dtype,
-        device=x.device,
-    ).view(1, 1, 3, 3)
-    ky = torch.tensor(
-        [[-1, -2, -1], [0, 0, 0], [1, 2, 1]],
-        dtype=x.dtype,
-        device=x.device,
-    ).view(1, 1, 3, 3)
-
-    x4d = x.unsqueeze(0)
-    gx = F.conv2d(x4d, kx, padding=1)
-    gy = F.conv2d(x4d, ky, padding=1)
-    edge = torch.sqrt(gx**2 + gy**2).squeeze(0)
-    return edge / (edge.max() + 1e-6)
+    raise NotImplementedError("课堂练习：请在这里实现 Sobel edge map。")
 
 
 class ExtraChannelDataset(Dataset):
-    """Add an edge or random-noise channel to a base Fashion-MNIST dataset."""
+    """TODO for class: add an edge or random-noise channel to the base dataset."""
 
     def __init__(self, base_dataset: Dataset, mode: str):
         if mode not in {"edge", "noise"}:
@@ -87,7 +70,8 @@ class ExtraChannelDataset(Dataset):
         if self.mode == "edge":
             extra = sobel_edge(x)
         else:
-            extra = torch.rand_like(x)
+            # TODO for class: replace this line with a random tensor shaped like x.
+            raise NotImplementedError("课堂练习：请在这里实现 random-noise control。")
         return torch.cat([x, extra], dim=0), y
 
 
@@ -194,6 +178,8 @@ def build_datasets(args):
     test_base = maybe_limit_dataset(test_base, args.limit_test)
 
     if args.variant in {"edge", "noise"}:
+        print("This variant is intentionally left as a classroom TODO.")
+        print("First reproduce the baseline, then implement ExtraChannelDataset during class.")
         return ExtraChannelDataset(train_base, args.variant), ExtraChannelDataset(test_base, args.variant), 2
     return train_base, test_base, 1
 
@@ -205,7 +191,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument("--device", type=str, default="cpu", choices=["cpu"])
     parser.add_argument("--data-dir", type=str, default="./data")
     parser.add_argument("--output-dir", type=str, default="./outputs")
     parser.add_argument("--num-workers", type=int, default=0)
