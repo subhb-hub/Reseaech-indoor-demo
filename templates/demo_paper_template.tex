@@ -22,23 +22,25 @@ This demo paper studies a small Fashion-MNIST classification problem. We reprodu
 
 Fashion-MNIST is a compact image classification dataset containing grayscale fashion product images from ten categories. It is suitable for beginner research training because the task is easy to understand, the dataset is small, and standard machine learning libraries provide stable data interfaces.
 
-In this project, we ask whether adding a simple edge channel can help a small CNN classify Fashion-MNIST images. We compare three variants: a baseline CNN, an edge-enhanced CNN, and a random-noise control.
+In this project, we ask whether adding a simple edge channel can help an official-style ConvNet classify Fashion-MNIST images. We compare three variants: an official-like CNN baseline, an edge-enhanced CNN, and a random-noise control.
 
 \section{Method}
 
-\subsection{Baseline CNN}
+\subsection{Baseline}
 
-The baseline model is a lightweight convolutional neural network with two convolutional layers, max pooling, and two fully connected layers.
+We use a PyTorch re-implementation of the official Fashion-MNIST ConvNet as our baseline. The original official implementation is provided in \texttt{benchmark/convnet.py} of the Fashion-MNIST repository. Since the official implementation is based on an older TensorFlow Estimator-style interface, we re-implement the same architecture in PyTorch for classroom experiments.
 
-\subsection{Edge-Enhanced Input}
+The model has two convolutional layers, two max-pooling layers, a 1024-unit fully connected layer, dropout, and a 10-class logits layer.
 
-The baseline input has shape $1 \times 28 \times 28$. In the edge-enhanced variant, we compute an edge map and concatenate it with the original grayscale image:
+\subsection{Toy Innovation}
+
+The baseline model takes a single-channel grayscale image as input. Our toy variant constructs an additional edge channel and concatenates it with the original image:
 
 \begin{equation}
 \tilde{X} = \mathrm{Concat}(X, E).
 \end{equation}
 
-The resulting input has shape $2 \times 28 \times 28$, so the first convolutional layer must use two input channels.
+The resulting input has shape $2 \times 28 \times 28$. Therefore, the first convolutional layer changes from one input channel to two input channels, while the rest of the network keeps the same structure.
 
 \subsection{Noise Control}
 
@@ -56,7 +58,7 @@ We use \texttt{torchvision.datasets.FashionMNIST} to download and load the datas
 \toprule
 Method & Input Type & Test Accuracy \\
 \midrule
-Baseline CNN & Original image & xx.xx \\
+Official-Like CNN & Original image & xx.xx \\
 Noise-Control CNN & Original + random noise & xx.xx \\
 Edge-Enhanced CNN & Original + edge map & xx.xx \\
 \bottomrule

@@ -5,9 +5,9 @@
 运行三组实验：
 
 ```bash
-python src/train.py --variant baseline --epochs 2 --use-subset
-python src/train.py --variant edge --epochs 2 --use-subset
-python src/train.py --variant noise --epochs 2 --use-subset
+python src/train.py --model official_like_cnn --variant baseline --epochs 2 --use-subset
+python src/train.py --model official_like_cnn --variant edge --epochs 2 --use-subset
+python src/train.py --model official_like_cnn --variant noise --epochs 2 --use-subset
 ```
 
 把 `results_summary.csv` 中的结果整理到：
@@ -27,7 +27,8 @@ templates/demo_paper_template.tex
 ## 3. 必写内容
 
 - Introduction: 为什么选择 Fashion-MNIST？
-- Method: baseline CNN 和 edge channel 分别是什么？
+- Baseline: 官方 `benchmark/convnet.py` 和 PyTorch 迁移版 `OfficialLikeCNN` 的关系是什么？
+- Method: edge channel 如何改变输入？
 - Experiments: baseline / edge / noise 怎么对比？
 - Results: 表格中的 accuracy 是多少？
 - Discussion: 结果是否支持你的想法？

@@ -23,9 +23,12 @@ def main() -> None:
     print("Device policy: CPU only")
 
     from src.model_baseline import SimpleCNN, count_parameters
+    from src.model_official_like import OfficialLikeCNN
 
-    model = SimpleCNN(in_channels=1)
-    print(f"Baseline model parameters: {count_parameters(model)}")
+    warmup = SimpleCNN(in_channels=1)
+    official_like = OfficialLikeCNN(in_channels=1)
+    print(f"Warm-up SimpleCNN parameters: {count_parameters(warmup)}")
+    print(f"OfficialLikeCNN baseline parameters: {count_parameters(official_like)}")
     print("Setup check passed.")
 
 
