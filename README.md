@@ -1,179 +1,155 @@
-# Fashion-MNIST CS Research Demo
+# Fashion-MNIST Research Demo
 
-这是一个给大一学生使用的 CS 科研入门实操仓库。课堂目标不是追求最高精度，而是手把手走完一次最小科研闭环：
+这是一个给大一学生使用的 CS 科研入门课堂仓库。目标不是一键跑出最高准确率，而是让学生真实经历一次最小科研闭环：
 
-找论文 -> 找官方代码仓库 -> clone 官方仓库 -> 复现 baseline -> 自己实现 toy innovation -> 设计对照实验 -> 整理结果 -> 写 demo paper。
+```text
+论文搜索 -> 官方仓库 -> 复制/迁移少量代码 -> 阅读代码 -> baseline 复现 -> toy innovation -> 消融实验 -> demo paper
+```
 
-配套讲义见 [fashion_mnist_research_handbook.md](fashion_mnist_research_handbook.md)。
+核心设计原则：
+
+- 官方 `zalandoresearch/fashion-mnist` 仓库用于理解论文、README、目录结构和原始 IDX 读取方式。
+- 本课堂仓库中的训练统一使用 `torchvision.datasets.FashionMNIST` 自动下载和缓存数据。
+- 不复制官方仓库的 `data/` 目录，避免课堂时间浪费在数据路径、压缩文件和 IDX 文件读取错误上。
+- `edge` 和 `noise` 变体保留 TODO，让学生自己找到并实现创新插入位置。
 
 ## 课前准备
-
-推荐使用 conda：
 
 ```bash
 conda create -n fashion-demo python=3.10 -y
 conda activate fashion-demo
 pip install -r requirements.txt
-```
-
-也可以用已有 Python 环境：
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-检查环境：
-
-```bash
 python scripts/check_setup.py
 ```
 
-## 课堂运行
+## 课堂路线
 
-### 1. 找到论文
+### 1. 找论文和官方仓库
 
-课堂上先从搜索开始，而不是直接运行代码。
-
-推荐搜索关键词：
+先搜索论文：
 
 ```text
-Fashion-MNIST paper
-Fashion-MNIST arXiv
-Fashion-MNIST a Novel Image Dataset for Benchmarking Machine Learning Algorithms
+Fashion-MNIST: A Novel Image Dataset for Benchmarking Machine Learning Algorithms
 ```
 
-目标论文：
-
-- arXiv: https://arxiv.org/abs/1708.07747
-- 题目：Fashion-MNIST: a Novel Image Dataset for Benchmarking Machine Learning Algorithms
-
-### 2. 找到官方代码仓库
-
-在论文页面、论文 PDF 或搜索结果中找到官方仓库：
+再找到官方仓库：
 
 ```text
 https://github.com/zalandoresearch/fashion-mnist
 ```
 
-判断它是不是官方仓库时，看三个信号：
+阅读任务见 [docs/01_find_paper_and_repo.md](docs/01_find_paper_and_repo.md)。
 
-- 作者或组织是 `zalandoresearch`。
-- README 中说明它是 Fashion-MNIST 数据集。
-- 仓库包含 `data/`、`utils/`、`benchmark/` 等目录。
-
-### 3. Clone 官方仓库并检查
-
-课堂上执行：
+### 2. Clone 官方仓库并复制少量文件
 
 ```bash
 bash scripts/clone_official_repo.sh
 ```
 
-它会把官方仓库克隆到：
+脚本会 clone 官方仓库到：
 
 ```text
-external/fashion-mnist
+official_fashion_mnist/
 ```
 
-检查脚本会用官方仓库的 `utils/mnist_reader.py` 读取数据，并打印训练集、测试集 shape。
+并复制这些文件到：
 
-### 4. 用官方数据链路做一次轻量复现
+```text
+third_party/fashion-mnist/
+├── README.md
+├── README.zh-CN.md   # 如果官方仓库中存在
+├── LICENSE
+└── mnist_reader.py
+```
 
-官方 README 提到可以运行 `benchmark/runner.py` 复现它的 benchmark，但完整 benchmark 覆盖很多 scikit-learn 分类器，课堂上可能偏慢。我们先做一个更适合笔记本的 smoke reproduction：
+注意：不要复制官方 `data/` 目录。阅读任务见 [docs/02_copy_and_read_official_code.md](docs/02_copy_and_read_official_code.md)。
+
+### 3. 跑课堂 baseline
+
+第一次运行会由 `torchvision.datasets.FashionMNIST` 自动下载数据到 `data/`：
 
 ```bash
-python scripts/reproduce_official_smoke.py
+python src/train.py --variant baseline --epochs 2 --use-subset
 ```
 
-这一步会：
-
-- 使用官方仓库的 `utils/mnist_reader.py` 读取 `external/fashion-mnist/data/fashion`。
-- 取一个小训练子集和测试子集。
-- 用一个轻量 scikit-learn baseline 训练并输出 accuracy。
-
-做到这里，学生已经完成了“找到论文 -> 找到官方仓库 -> clone -> 用官方数据链路复现一个最小实验”。
-
-### 5. 复现本课程 PyTorch baseline
-
-课程里为了让 CPU 笔记本稳定完成 CNN 训练，我们再使用本仓库的 PyTorch baseline 进行复现。
-
-先用 1 个 epoch 快速确认 baseline：
+兼容旧入口也可以运行：
 
 ```bash
-python train_fashion.py --variant baseline --epochs 1 --device cpu
+python train_fashion.py --variant baseline --epochs 2 --use-subset
 ```
 
-如果时间和电脑性能允许，再改成 3 个 epoch：
+### 4. 找创新插入位置
+
+阅读：
+
+- [src/data.py](src/data.py)
+- [src/transforms_custom.py](src/transforms_custom.py)
+- [src/model_baseline.py](src/model_baseline.py)
+- [src/train.py](src/train.py)
+
+重点问题：
+
+- transform 在哪里传入？
+- 模型输入通道在哪里定义？
+- 如果输入从 `[1, 28, 28]` 变成 `[2, 28, 28]`，哪些文件会被牵动？
+
+任务见 [docs/03_find_innovation_position.md](docs/03_find_innovation_position.md)。
+
+### 5. 实现 toy innovation 和消融
+
+学生补完 [src/transforms_custom.py](src/transforms_custom.py) 中的 TODO 后运行：
 
 ```bash
-python train_fashion.py --variant baseline --epochs 3 --device cpu
+python src/train.py --variant baseline --epochs 2 --use-subset
+python src/train.py --variant edge --epochs 2 --use-subset
+python src/train.py --variant noise --epochs 2 --use-subset
 ```
 
-运行后会生成：
-
-- `data/`: 自动下载的 Fashion-MNIST 数据。
-- `outputs/`: 训练好的模型权重。
-- `results_summary.csv`: 每次实验的汇总记录。
-
-### 6. 课堂实现创新
-
-`train_fashion.py` 里已经留下了两个课堂 TODO：
-
-- `sobel_edge`: 学生现场实现 Sobel 边缘图。
-- `ExtraChannelDataset`: 学生现场实现 `edge` 和 `noise` 两种额外通道。
-
-完成 TODO 后，再运行：
+课后完整训练：
 
 ```bash
-python train_fashion.py --variant edge --epochs 1 --device cpu
-python train_fashion.py --variant noise --epochs 1 --device cpu
+python src/train.py --variant baseline --epochs 10 --no-subset
+python src/train.py --variant edge --epochs 10 --no-subset
+python src/train.py --variant noise --epochs 10 --no-subset
 ```
-
-### 7. 半自动课堂脚本
-
-macOS / Linux 可以执行：
-
-```bash
-bash scripts/run_all_experiments.sh 1
-```
-
-这个脚本默认只跑 baseline，并提示创新 TODO 完成后的下一步命令。
 
 ## 项目结构
 
 ```text
 .
-├── data/                              # 数据集下载目录，不提交真实数据
-├── demo_paper/                        # demo LaTeX paper 模板
-├── outputs/                           # 模型输出目录，不提交模型权重
+├── README.md
+├── third_party/
+│   └── fashion-mnist/
+│       └── SOURCE.md
+├── src/
+│   ├── data.py
+│   ├── model_baseline.py
+│   ├── train.py
+│   ├── evaluate.py
+│   └── transforms_custom.py
+├── templates/
+│   ├── innovation_template.py
+│   ├── experiment_record.csv
+│   └── demo_paper_template.tex
+├── docs/
+│   ├── 00_task_card.md
+│   ├── 01_find_paper_and_repo.md
+│   ├── 02_copy_and_read_official_code.md
+│   ├── 03_find_innovation_position.md
+│   └── 04_write_demo_paper.md
 ├── scripts/
-│   ├── check_setup.py                 # 课前环境检查
-│   ├── check_official_clone.py         # 检查官方仓库和数据读取
-│   ├── clone_official_repo.sh          # clone 官方 Fashion-MNIST 仓库
-│   ├── reproduce_official_smoke.py     # 用官方数据链路做轻量复现
-│   └── run_all_experiments.sh          # 先跑 baseline，再提示创新实验
-├── train_fashion.py                   # 主训练脚本，创新部分保留 TODO
-├── requirements.txt
-├── environment.yml
-└── fashion_mnist_research_handbook.md
+│   ├── clone_official_repo.sh
+│   ├── check_official_clone.py
+│   ├── check_setup.py
+│   └── run_all_experiments.sh
+└── train_fashion.py
 ```
 
-## 实验变体
+## 写作
 
-| Variant | 输入 | 作用 |
-|---|---|---|
-| `baseline` | 原始灰度图 | 基础对照 |
-| `edge` | 原始灰度图 + Sobel 边缘图 | 教学型创新 |
-| `noise` | 原始灰度图 + 随机噪声图 | 负对照 |
+跑完实验后，把 `results_summary.csv` 中的结果整理到：
 
-注意：`edge` 和 `noise` 不是开箱即用答案，需要课堂上由学生补完 TODO。
+- [templates/experiment_record.csv](templates/experiment_record.csv)
+- [templates/demo_paper_template.tex](templates/demo_paper_template.tex)
 
-## 写作模板
-
-`demo_paper/main.tex` 是一份 2--4 页 demo paper 模板。学生跑完实验后，把 `results_summary.csv` 里的准确率填入表格即可。
-
-## 说明
-
-这个项目用于教学。Edge-Enhanced Fashion-CNN 是一个训练科研流程的 toy idea，不代表正式科研贡献，也不保证一定提升准确率。
-
-课堂默认全部使用 CPU 运行，以减少不同学生电脑之间的环境差异。
+更详细的写作任务见 [docs/04_write_demo_paper.md](docs/04_write_demo_paper.md)。

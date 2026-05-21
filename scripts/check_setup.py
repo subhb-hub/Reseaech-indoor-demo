@@ -13,7 +13,6 @@ def main() -> None:
     try:
         import torch
         import torchvision
-        import sklearn
     except ImportError as exc:
         print(f"Missing dependency: {exc.name}")
         print("Run: pip install -r requirements.txt")
@@ -21,10 +20,9 @@ def main() -> None:
 
     print(f"PyTorch: {torch.__version__}")
     print(f"Torchvision: {torchvision.__version__}")
-    print(f"Scikit-learn: {sklearn.__version__}")
     print("Device policy: CPU only")
 
-    from train_fashion import SimpleCNN, count_parameters
+    from src.model_baseline import SimpleCNN, count_parameters
 
     model = SimpleCNN(in_channels=1)
     print(f"Baseline model parameters: {count_parameters(model)}")

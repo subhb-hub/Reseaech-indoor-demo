@@ -1,0 +1,77 @@
+\documentclass[10pt,conference]{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{Edge-Enhanced Fashion-CNN: A Teaching-Oriented Study on Fashion-MNIST}
+
+\author{
+\IEEEauthorblockN{Student Name}
+\IEEEauthorblockA{Course Demo Project}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This demo paper studies a small Fashion-MNIST classification problem. We reproduce a baseline convolutional neural network, implement a toy edge-enhanced input transform, and compare it with a random-noise control. The purpose is not to claim state-of-the-art performance, but to practice a minimal research workflow: paper search, official repository reading, baseline reproduction, method modification, ablation, and academic writing.
+\end{abstract}
+
+\section{Introduction}
+
+Fashion-MNIST is a compact image classification dataset containing grayscale fashion product images from ten categories. It is suitable for beginner research training because the task is easy to understand, the dataset is small, and standard machine learning libraries provide stable data interfaces.
+
+In this project, we ask whether adding a simple edge channel can help a small CNN classify Fashion-MNIST images. We compare three variants: a baseline CNN, an edge-enhanced CNN, and a random-noise control.
+
+\section{Method}
+
+\subsection{Baseline CNN}
+
+The baseline model is a lightweight convolutional neural network with two convolutional layers, max pooling, and two fully connected layers.
+
+\subsection{Edge-Enhanced Input}
+
+The baseline input has shape $1 \times 28 \times 28$. In the edge-enhanced variant, we compute an edge map and concatenate it with the original grayscale image:
+
+\begin{equation}
+\tilde{X} = \mathrm{Concat}(X, E).
+\end{equation}
+
+The resulting input has shape $2 \times 28 \times 28$, so the first convolutional layer must use two input channels.
+
+\subsection{Noise Control}
+
+We also add a random-noise control. This tests whether any observed change comes from meaningful edge information or merely from adding an extra channel.
+
+\section{Experiments}
+
+We use \texttt{torchvision.datasets.FashionMNIST} to download and load the dataset. During class, we train on a small subset to keep the experiment fast.
+
+\begin{table}[t]
+\centering
+\caption{Comparison on Fashion-MNIST. Replace placeholders with values from \texttt{results\_summary.csv}.}
+\label{tab:results}
+\begin{tabular}{llc}
+\toprule
+Method & Input Type & Test Accuracy \\
+\midrule
+Baseline CNN & Original image & xx.xx \\
+Noise-Control CNN & Original + random noise & xx.xx \\
+Edge-Enhanced CNN & Original + edge map & xx.xx \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+
+Discuss whether the edge-enhanced variant improves over the baseline and the noise control. If the result is weak or unstable, explain possible reasons honestly, such as limited training data, too few epochs, or an overly simple edge transform.
+
+\section{Conclusion}
+
+This project demonstrates a small but complete research workflow: reading a paper and official repository, reproducing a baseline, implementing a toy innovation, running ablation experiments, and writing a paper-style report.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

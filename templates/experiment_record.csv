@@ -1,0 +1,4 @@
+variant,epochs,use_subset,train_samples,test_samples,input_channels,best_test_acc,notes
+baseline,2,true,5000,1000,1,,
+edge,2,true,5000,1000,2,,
+noise,2,true,5000,1000,2,,
