@@ -129,12 +129,6 @@ python src/train.py --model official_like_cnn --variant edge --epochs 10 --no-su
 python src/train.py --model official_like_cnn --variant noise --epochs 10 --no-subset
 ```
 
-教师兜底脚本，不建议学生第一步使用：
-
-```bash
-bash scripts/run_all_experiments.sh
-```
-
 ## 项目结构
 
 ```text
@@ -165,9 +159,8 @@ bash scripts/run_all_experiments.sh
 ├── scripts/
 │   ├── clone_official_repo.sh
 │   ├── check_official_clone.py
-│   ├── check_setup.py
-│   └── run_all_experiments.sh
-└── fashion_mnist_research_handbook.md
+│   └── check_setup.py
+└── requirements.txt
 ```
 
 ## 写作

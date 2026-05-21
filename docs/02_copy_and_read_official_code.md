@@ -12,22 +12,9 @@ git clone https://github.com/zalandoresearch/fashion-mnist.git official_fashion_
 bash scripts/clone_official_repo.sh
 ```
 
-## 2. 复制少量文件
+## 2. 复制需要的文件
 
-不要复制 `data/`。
 
-```bash
-mkdir -p third_party/fashion-mnist/benchmark
-cp official_fashion_mnist/README.md third_party/fashion-mnist/
-if [ -f official_fashion_mnist/README.zh-CN.md ]; then
-    cp official_fashion_mnist/README.zh-CN.md third_party/fashion-mnist/
-fi
-cp official_fashion_mnist/LICENSE third_party/fashion-mnist/
-cp official_fashion_mnist/utils/mnist_reader.py third_party/fashion-mnist/
-cp official_fashion_mnist/benchmark/convnet.py third_party/fashion-mnist/benchmark/
-```
-
-如果官方仓库没有 `README.zh-CN.md`，可以跳过这一项。
 
 ## 3. 为什么复制 `mnist_reader.py` 和 `convnet.py`
 
@@ -44,7 +31,7 @@ src/model_official_like.py
 1. 它是 PyTorch 生态中的标准数据接口；
 2. 它可以自动下载和缓存数据；
 3. 它能与 `transforms` 和 `DataLoader` 无缝连接；
-4. 它更适合课堂快速复现实验。
+
 
 ## 4. 阅读问题
 

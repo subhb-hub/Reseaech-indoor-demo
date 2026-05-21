@@ -6,12 +6,9 @@ venv/
 env/
 
 external/*
-!external/.gitkeep
 official_fashion_mnist/
 data/*
-!data/.gitkeep
 outputs/*
-!outputs/.gitkeep
 runs/
 checkpoints/
 
