@@ -16,6 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 from src.data import get_loaders
 from src.evaluate import evaluate
 from src.model_baseline import SimpleCNN, count_parameters
+from src.model_official_like import OfficialLikeCNN
 
 
 def set_seed(seed: int = 42) -> None:
@@ -51,6 +52,16 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
     return total_loss / total, correct / total
 
 
+def build_model(model_name: str, in_channels: int):
+    if model_name == "simple_cnn":
+        return SimpleCNN(in_channels=in_channels, num_classes=10)
+
+    if model_name == "official_like_cnn":
+        return OfficialLikeCNN(in_channels=in_channels, num_classes=10)
+
+    raise ValueError(f"Unknown model: {model_name}")
+
+
 def append_result(csv_path: Path, row: dict) -> None:
     file_exists = csv_path.exists()
     with csv_path.open("a", newline="", encoding="utf-8") as f:
@@ -62,6 +73,13 @@ def append_result(csv_path: Path, row: dict) -> None:
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fashion-MNIST baseline and toy research variants.")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="official_like_cnn",
+        choices=["simple_cnn", "official_like_cnn"],
+        help="Model architecture. official_like_cnn is the PyTorch version of the official convnet.py baseline.",
+    )
     parser.add_argument("--variant", type=str, default="baseline", choices=["baseline", "edge", "noise"])
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--batch-size", type=int, default=64)
@@ -105,10 +123,11 @@ def main() -> None:
         num_workers=args.num_workers,
     )
 
-    model = SimpleCNN(in_channels=in_channels, num_classes=10).to(device)
+    model = build_model(args.model, in_channels).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss()
 
+    print(f"Model: {args.model}")
     print(f"Variant: {args.variant}")
     print(f"Device: {device}")
     print(f"Input channels: {in_channels}")
@@ -127,10 +146,11 @@ def main() -> None:
             f"test loss {test_loss:.4f} | test acc {test_acc:.4f}"
         )
 
-    model_path = output_dir / f"model_{args.variant}.pt"
+    model_path = output_dir / f"model_{args.model}_{args.variant}.pt"
     torch.save(model.state_dict(), model_path)
 
     result_row = {
+        "model": args.model,
         "variant": args.variant,
         "epochs": args.epochs,
         "batch_size": args.batch_size,

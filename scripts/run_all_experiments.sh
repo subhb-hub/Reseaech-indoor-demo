@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EPOCHS="${1:-1}"
+EPOCHS="${1:-2}"
 
-python src/train.py --variant baseline --epochs "$EPOCHS" --use-subset --device cpu
+python src/train.py --model official_like_cnn --variant baseline --epochs "$EPOCHS" --use-subset --device cpu
+python src/train.py --model official_like_cnn --variant edge --epochs "$EPOCHS" --use-subset --device cpu
+python src/train.py --model official_like_cnn --variant noise --epochs "$EPOCHS" --use-subset --device cpu
 
 echo ""
-echo "Baseline finished."
-echo "After the class implements edge/noise TODOs in src/transforms_custom.py, run:"
-echo "python src/train.py --variant edge --epochs $EPOCHS --use-subset --device cpu"
-echo "python src/train.py --variant noise --epochs $EPOCHS --use-subset --device cpu"
+echo "Finished official_like_cnn baseline / edge / noise experiments."

@@ -13,6 +13,7 @@ else
 fi
 
 mkdir -p "$TARGET_DIR"
+mkdir -p "$TARGET_DIR/benchmark"
 cp "$OFFICIAL_DIR/README.md" "$TARGET_DIR/"
 
 if [ -f "$OFFICIAL_DIR/README.zh-CN.md" ]; then
@@ -23,5 +24,6 @@ fi
 
 cp "$OFFICIAL_DIR/LICENSE" "$TARGET_DIR/"
 cp "$OFFICIAL_DIR/utils/mnist_reader.py" "$TARGET_DIR/"
+cp "$OFFICIAL_DIR/benchmark/convnet.py" "$TARGET_DIR/benchmark/"
 
 python scripts/check_official_clone.py

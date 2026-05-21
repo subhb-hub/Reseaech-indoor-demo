@@ -4,8 +4,14 @@ from torchvision import transforms
 
 class EdgeEnhancedTransform:
     """
-    TODO:
-    Implement an edge-enhanced input transform.
+    Student TODO.
+
+    This transform changes the input of the official-like ConvNet:
+
+        baseline input: [1, 28, 28]
+        edge input:    [2, 28, 28]
+
+    Therefore, OfficialLikeCNN(in_channels=2) is required.
 
     Expected input:
         PIL image from Fashion-MNIST.
@@ -36,7 +42,9 @@ class EdgeEnhancedTransform:
 class NoiseEnhancedTransform:
     """
     Negative-control variant.
-    This is used to test whether adding an extra channel is always useful.
+
+    It tests whether improvement comes from meaningful edge information
+    or simply from adding one more channel.
     """
 
     def __init__(self):

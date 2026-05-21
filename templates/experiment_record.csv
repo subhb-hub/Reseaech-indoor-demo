@@ -1,4 +1,5 @@
-variant,epochs,use_subset,train_samples,test_samples,input_channels,best_test_acc,notes
-baseline,2,true,5000,1000,1,,
-edge,2,true,5000,1000,2,,
-noise,2,true,5000,1000,2,,
+model,variant,input,epochs,train_subset,test_subset,test_acc,notes
+simple_cnn,baseline,original,2,5000,1000,,warm-up only
+official_like_cnn,baseline,original,2,5000,1000,,official convnet PyTorch port
+official_like_cnn,edge,original+edge,2,5000,1000,,toy innovation
+official_like_cnn,noise,original+noise,2,5000,1000,,negative control

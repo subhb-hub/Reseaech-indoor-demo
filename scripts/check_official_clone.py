@@ -15,6 +15,7 @@ def main() -> None:
         THIRD_PARTY_COPY / "README.md",
         THIRD_PARTY_COPY / "LICENSE",
         THIRD_PARTY_COPY / "mnist_reader.py",
+        THIRD_PARTY_COPY / "benchmark" / "convnet.py",
     ]
     missing = [path for path in expected if not path.exists()]
     if missing:
@@ -25,7 +26,11 @@ def main() -> None:
 
     optional = THIRD_PARTY_COPY / "README.zh-CN.md"
     print("Official Fashion-MNIST reading files are copied.")
-    print("Required files:")
+    print("Students should read:")
+    print("- third_party/fashion-mnist/README.md")
+    print("- third_party/fashion-mnist/benchmark/convnet.py")
+    print("- third_party/fashion-mnist/mnist_reader.py")
+    print("Copied files:")
     for path in expected:
         print(f"- {path.relative_to(REPO_ROOT)}")
     if optional.exists():

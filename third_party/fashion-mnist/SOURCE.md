@@ -12,8 +12,16 @@ Copy only:
 - `README.zh-CN.md`, if available
 - `LICENSE`
 - `utils/mnist_reader.py`
+- `benchmark/convnet.py`
 
-Do not copy the official `data/` directory. This classroom repository trains with `torchvision.datasets.FashionMNIST`.
+Do not copy the official `data/` directory.
+
+In this classroom repository:
+
+- `benchmark/convnet.py` is used for reading the official ConvNet baseline.
+- `mnist_reader.py` is used for understanding the original IDX data reader.
+- Training uses `torchvision.datasets.FashionMNIST`.
+- The runnable baseline is a PyTorch re-implementation in `src/model_official_like.py`.
 
 Run:
 

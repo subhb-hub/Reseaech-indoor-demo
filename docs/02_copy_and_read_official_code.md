@@ -1,4 +1,4 @@
-# Copy And Read Official Code
+    # Copy And Read Official Code
 
 ## 1. Clone 官方仓库
 
@@ -12,17 +12,9 @@ git clone https://github.com/zalandoresearch/fashion-mnist.git official_fashion_
 bash scripts/clone_official_repo.sh
 ```
 
-## 2. 复制少量文件
+## 2. 分析你需要那些文件并复制过来
 
-不要复制 `data/`。
 
-```bash
-mkdir -p third_party/fashion-mnist
-cp official_fashion_mnist/README.md third_party/fashion-mnist/
-cp official_fashion_mnist/README.zh-CN.md third_party/fashion-mnist/
-cp official_fashion_mnist/LICENSE third_party/fashion-mnist/
-cp official_fashion_mnist/utils/mnist_reader.py third_party/fashion-mnist/
-```
 
 如果官方仓库没有 `README.zh-CN.md`，可以跳过这一项。
 
