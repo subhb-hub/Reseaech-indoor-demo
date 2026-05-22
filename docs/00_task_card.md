@@ -17,6 +17,12 @@
 5. edge / noise 两组消融结果。
 6. 一份 demo paper 草稿。
 
+创新点说明和实现提示见：
+
+```text
+docs/04_find_innovation_position.md
+```
+
 ## 核心原则
 
 官方 `benchmark/convnet.py` 是 baseline 来源；本仓库提供 PyTorch 迁移版 `OfficialLikeCNN`；训练数据统一使用 `torchvision.datasets.FashionMNIST`。
